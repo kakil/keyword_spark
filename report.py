@@ -58,10 +58,10 @@ def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count
     y -= 20
     for idea in content_ideas:
     # Split the idea into sections based on occurrences of a number followed by a period
-        sections = re.split(r'(\d+\.\s)', idea)
+        sections = re.split(r'(\d+[\.\)]\s)', idea)
         for section in sections:
             # If the section is a number followed by a period and a space, start a new line
-            if re.match(r"\d+\.\s", section):
+            if re.match(r"\d+[\.\)]\s", section):
                 y -= 15
                 if y < 30:
                     new_page()
@@ -77,7 +77,7 @@ def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count
                 lines = textwrap.wrap(section, width=70)
                 for line in lines:
                     # Print the line as is, without any "-"
-                    c.drawString(50, y, "     " + line)
+                    c.drawString(50, y, "      " + line)
                     y -= 15
                     if y < 30:
                         new_page()
@@ -95,11 +95,33 @@ def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count
     c.setFont("Helvetica", 12)
     y -= 20
     for tweet in tweets:
-        for line in textwrap.wrap(tweet, width=70):
-            c.drawString(50, y, "- " + line)
-            y -= 15
-            if y < 30:
-                new_page()
+        # split the tweets into sections based on occurrences of a number followed by a period
+        sections = re.split(r'(\d+[\.\)]\s)', tweet)
+        for section in sections:
+            # If the section is a number followed by a period and a space, start a new line
+            if re.match(r"\d+[\.\)]\s", section):
+                y -= 15
+                if y < 30:
+                    new_page()
+                
+                # Wrapt the section and print each line
+                lines_to_print = textwrap.wrap(section, width=70)
+                for line_to_print in lines_to_print:
+                    c.drawString(50, y, line_to_print)
+                    # y -= 15
+                    if y < 30:
+                        new_page()      
+            else:
+                # Wrap the section and print each line
+                lines = textwrap.wrap(section, width=70)
+                for line in lines:
+                    #Print the line as is 
+                    c.drawString(50, y, "     " + line)
+                    y -= 15
+                    if y < 30:
+                        new_page()
+                
+            
 
     # Add a space between sections
     y -= 20
