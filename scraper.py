@@ -47,7 +47,7 @@ def perform_google_search(query):
 
 def get_brand_mentions(text, keyword):
     # Split the text into sentences
-    sentences = re.split('(?<=[.!?]) +', text)
+    sentences = re.split('(?<=[.!?]) *\n{2} +', text)
 
     # Find and return sentences that contain the keyword
     keyword_sentences = [sentence for sentence in sentences if keyword.lower() in sentence.lower()]

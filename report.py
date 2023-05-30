@@ -6,6 +6,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import textwrap
 
+import re
+
 def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count):
     # Create a new PDF document with the given filename
     pdf_filename = 'report.pdf'
@@ -31,11 +33,19 @@ def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count
     c.setFont("Helvetica", 12)
     y -= 20
     for summary in summaries:
-        for line in textwrap.wrap(summary, width=70):
-            c.drawString(50, y, "- " + line)
-            y -= 15
-            if y < 30:
-                new_page()
+        lines = summary.splitlines()  # split the summary into lines
+        for i, line in enumerate(lines):
+            wrapped_lines = textwrap.wrap(line, width=70)  # wrap each line to the desired width
+            for j, wrapped_line in enumerate(wrapped_lines):
+                # Only add a dash if it's the start of a new summary and the first character is not a dash
+                if j == 0 and not line.startswith('-'):
+                    c.drawString(50, y, "- " + wrapped_line)
+                else:
+                    c.drawString(50, y, wrapped_line)
+                y -= 15
+                if y < 30:
+                    new_page()
+
 
     # Add a space between sections
     y -= 20
@@ -47,11 +57,33 @@ def generate_pdf_report(topic, summaries, content_ideas, tweets,cost,token_count
     c.setFont("Helvetica", 12)
     y -= 20
     for idea in content_ideas:
-        for line in textwrap.wrap(idea, width=70):
-            c.drawString(50, y, "- " + line)
-            y -= 15
-            if y < 30:
-                new_page()
+    # Split the idea into sections based on occurrences of a number followed by a period
+        sections = re.split(r'(\d+\.\s)', idea)
+        for section in sections:
+            # If the section is a number followed by a period and a space, start a new line
+            if re.match(r"\d+\.\s", section):
+                y -= 15
+                if y < 30:
+                    new_page()
+                # Wrap the section and print each line
+                lines_to_print = textwrap.wrap(section.strip(), width=70)
+                for line_to_print in lines_to_print:
+                    c.drawString(50, y, line_to_print)
+                    # y -= 15
+                    if y < 30:
+                        new_page()
+            else:
+                # Wrap the section and print each line
+                lines = textwrap.wrap(section, width=70)
+                for line in lines:
+                    # Print the line as is, without any "-"
+                    c.drawString(50, y, "     " + line)
+                    y -= 15
+                    if y < 30:
+                        new_page()
+                    
+
+
 
     # Add a space between sections
     y -= 20

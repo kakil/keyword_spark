@@ -1,9 +1,14 @@
 import openai
 import tiktoken
 import prompts as pr
+from dotenv import load_dotenv
+import os
+
+# Load the .env file. By default, it checks the same directory as the script for the .env file.
+load_dotenv()
 
 selected_model = "gpt-3.5-turbo"
-openai.api_key = "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"
+openai.api_key = os.getenv('API_KEY')
 
 
 def generate_text_with_openai(user_prompt):
@@ -48,5 +53,5 @@ def generate_tweets(blog_bullet_points):
         InputText=blog_bullet_points
     )
     tweets = generate_text_with_openai(tweets_prompt)
-
+    tweets += "\n\n"
     return tweets
